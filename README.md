@@ -1,0 +1,1 @@
+# Paterinu-analize
