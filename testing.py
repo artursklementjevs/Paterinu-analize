@@ -1,6 +1,7 @@
 import pandas as pd
 import openpyxl
 from openpyxl import Workbook
+from openpyxl.chart import PieChart, Reference
 
 Wb_test = Workbook()
 Wb_test.save("analize.xlsx")
@@ -16,10 +17,16 @@ avota_nauda = 0
 
 i = 1
 
-rinda = 1
+rinda = 2
 
 
 df = pd.read_excel('example.xls')
+pieraksts = sheet.cell(row = 1, column = 1)
+pieraksts.value = "Avota nosaukums"
+
+pieraksts = sheet.cell(row = 1, column = 2)
+pieraksts.value = "Patēriņa summa"
+
 
 ########################### DATU IEVADE ##############################################
 
@@ -35,7 +42,7 @@ skaits = float(skaits)
 while (i<=skaits):
     avots = input("Ievadi avota nosaukumu: ")
     pieraksts = sheet.cell(row = rinda, column = 1)
-    pieraksts.value = str(avots)
+    pieraksts.value = avots
 
     kartosana = df['Unnamed: 2'].str.contains(avots, case=False, na=False)
     avota_df = df[kartosana]
@@ -44,7 +51,7 @@ while (i<=skaits):
             avota_nauda = avota_nauda + summa
 
     pieraksts = sheet.cell(row=rinda, column=2)
-    pieraksts.value = str(avota_nauda)
+    pieraksts.value = avota_nauda
     cita_nauda = cita_nauda - avota_nauda
     print(avots + " patēriņš : " + str(round(avota_nauda, 2)) + "€")
 
@@ -73,18 +80,18 @@ for summa in parejais_df['Unnamed: 5']:
 pieraksts = sheet.cell(row=rinda, column=1)
 pieraksts.value = "RIMI"
 pieraksts = sheet.cell(row=rinda, column=2)
-pieraksts.value = str(round(rimi_nauda, 2))
+pieraksts.value = round(rimi_nauda, 2)
 rinda = rinda + 1
 pieraksts = sheet.cell(row=rinda, column=1)
 pieraksts.value = "EXPO"
 pieraksts = sheet.cell(row=rinda, column=2)
-pieraksts.value = str(round(expo_nauda, 2))
+pieraksts.value = round(expo_nauda, 2)
 rinda = rinda + 1
 cita_nauda = cita_nauda - rimi_nauda - expo_nauda
 pieraksts = sheet.cell(row=rinda, column=1)
 pieraksts.value = "Pārējais"
 pieraksts = sheet.cell(row=rinda, column=2)
-pieraksts.value = str(round(cita_nauda, 2))
+pieraksts.value = round(cita_nauda, 2)
 
 wb.save("analize.xlsx")
 ########################### DATU IZVADE ########################################
@@ -107,19 +114,19 @@ print("Mēneša atlikums:" + str(budzets + round(kopeja_nauda, 2))+"€")
 
 ########################### DATU IEVADE GRAFIKĀ ##################################
 
-from openpyxl.chart import PieChart, Reference
-import matplotlib.pyplot as plt
 
 wb = openpyxl.load_workbook('analize.xlsx')
-
-data = Reference(wb['Sheet'], min_col=1, min_row=1, max_col=2, max_row=rinda)
-
-
+ws = wb.active
 pica = PieChart()
-pica.add_data(data, titles_from_data=True)
 
 
-sheet.add_chart(pica, 'C2')
+avoti = Reference(ws, min_col=1, min_row=2, max_row=rinda)
+dati = Reference(ws, min_col=2, min_row=2, max_row=rinda)
+
+pica.add_data(dati)
+pica.set_categories(avoti)
+pica.title = ws.cell(1, 1).value
+pica.title = "Mēneša patēriņš"
+ws.add_chart(pica, 'D1')
 wb.save('analize.xlsx')
 wb.close()
-plt.show()
