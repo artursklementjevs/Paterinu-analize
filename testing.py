@@ -19,14 +19,14 @@ i = 1
 rinda = 1
 
 
-df = pd.read_excel('C:/Users/user/PycharmProjects/pythonProject4/gads.xls')
+df = pd.read_excel('example.xls')
 
 ########################### DATU IEVADE ##############################################
 
 
-budzets = input("Mēneša budžets: ")
+budzets = input("Sveicināts! Kāds ir šī mēneša budžets: ")
 budzets = float(budzets)
-skaits = input("Sveicināts! Cik patēriņu avotus vēlies apskatīt?: ")
+skaits = input("Cik patēriņu avotus vēlies apskatīt?: ")
 skaits = float(skaits)
 
 
@@ -71,7 +71,7 @@ for summa in parejais_df['Unnamed: 5']:
     kopeja_nauda = summa
 
 pieraksts = sheet.cell(row=rinda, column=1)
-pieraksts.value = "ŖIMI"
+pieraksts.value = "RIMI"
 pieraksts = sheet.cell(row=rinda, column=2)
 pieraksts.value = str(round(rimi_nauda, 2))
 rinda = rinda + 1
@@ -86,7 +86,7 @@ pieraksts.value = "Pārējais"
 pieraksts = sheet.cell(row=rinda, column=2)
 pieraksts.value = str(round(cita_nauda, 2))
 
-wb.save("C:/Users/user/PycharmProjects/pythonProject4/analize.xlsx")
+wb.save("analize.xlsx")
 ########################### DATU IZVADE ########################################
 
 
@@ -107,3 +107,19 @@ print("Mēneša atlikums:" + str(budzets + round(kopeja_nauda, 2))+"€")
 
 ########################### DATU IEVADE GRAFIKĀ ##################################
 
+from openpyxl.chart import PieChart, Reference
+import matplotlib.pyplot as plt
+
+wb = openpyxl.load_workbook('analize.xlsx')
+
+data = Reference(wb['Sheet'], min_col=1, min_row=1, max_col=2, max_row=rinda)
+
+
+pica = PieChart()
+pica.add_data(data, titles_from_data=True)
+
+
+sheet.add_chart(pica, 'C2')
+wb.save('analize.xlsx')
+wb.close()
+plt.show()
